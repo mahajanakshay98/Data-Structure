@@ -1,0 +1,171 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
+
+class Hashtable
+{
+	struct Entry
+	{
+		int key;
+		string value;
+		Entry *next;
+
+		Entry(int key, string &value)
+			:key(key), value(value), next(nullptr)
+		{
+		}
+	};
+
+	int size;
+	Entry **table;
+
+public:
+
+	Hashtable(int size = 10)
+	{
+		this->size = size;
+		// create array of pointers on heap
+		table = new Entry* [size]; 
+
+		// making all pointers in table to null
+		for(int i = 0; i < size; i++ )
+		{
+			table[i] = nullptr;
+		}
+	}
+
+	//compute the hash value
+	int Hash (int key)
+	{
+		int offset = key % size;
+		return offset;
+	}
+
+	void put (int key, string& value)
+	{
+		// 1. to determine offset using key
+		int offset = Hash(key);
+		Entry *newentry = new Entry(key, value);
+
+		// condition for inserting 1st ele
+		if (nullptr == table[offset])
+		{
+			table[offset] = newentry;
+		}
+
+		for (Entry *current = table[offset]; current; current = current->next)
+		{
+
+			//overwriting same key value
+			if (key == current->key)
+			{
+				current->value = value;
+				return;
+			}
+		}
+
+		// when table is not empty, insert at first
+		newentry->next = table[offset];
+		table[offset] = newentry;
+	}
+
+	bool get (int key)
+	{
+		int offset = Hash(key);
+
+		for (Entry *current = table[offset]; current ; current = current->next)
+		{
+			// key mil gayi !!
+			if (key == current->key)
+			{
+				cout << "value is:- "<<endl;
+				cout << current->value << "\n" <<endl;
+				return true;
+			}
+		}
+		cout  << " value not found" <<endl;
+		return false;
+	}
+
+	void remove(int key)
+	{
+		// to check offset
+		int offset = Hash(key);
+
+		Entry *back = table[offset];
+		for(Entry *current = table[offset]; current; current = current->next)
+		{
+			// key mil gayi
+			if (current->key == key)
+			{
+				// to remove first element of list
+				if(current == table[offset])
+				{
+					table[offset] = current->next;
+					delete current;
+					return ;
+				}
+				else
+				{
+					back->next = current->next;
+					delete current;
+					return;
+				}
+			}
+			back = current;
+		}
+
+	}
+
+	void printdebug()
+	{
+		for ( int offset = 0; offset < size; offset++)
+		{
+			cout << setw(2) << offset << ": " << "\n";
+			for(Entry *current = table[offset] ; current; current = current->next)
+			{
+				cout << "[" << current->key << ": " << current->value << "]" <<  endl;
+			}
+		}
+	}
+
+
+
+
+};
+
+int main()
+{
+	int num;
+	string value;
+	Hashtable h;
+	while( cout << "Enter the key: ",
+		cin >> num,
+		cout << "Enter the name: ",
+		cin >> value,
+		num)
+	{
+		h.put(num, value);
+		h.printdebug();
+		cout << "\n";
+	}
+
+	while( cout << "Enter the key to fetch value: ",
+		cin >> num,
+		num)
+	{
+		h.get(num);
+		cout << "\n";
+	}
+
+	while( cout << "Enter the key to REMOVE VALUE: ",
+		cin >> num,
+		num)
+	{
+		h.remove(num);
+		h.printdebug();
+	
+	}
+
+}

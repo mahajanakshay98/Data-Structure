@@ -1,0 +1,164 @@
+#include <iostream>
+using namespace std;
+#include <iomanip>
+class Tree
+{
+	struct Node
+	{
+		Node *left;
+		int value;
+		Node *right;
+
+
+	public:
+		Node(int value) : left(nullptr),value(value),right(nullptr)
+		{
+		}
+
+	};
+
+
+	Node *root;
+
+	// to add node
+	Node* addNode(Node *node,int value)
+	{
+
+		if(nullptr == node)
+			return new Node(value);
+
+		if(value > node->value)
+			node->right = addNode(node->right,value);
+		else
+			node->left=addNode(node->left,value);
+		return node;
+	}
+
+	//to remove node 
+	Node* remove(Node *node, int value)
+	{
+		// if value is greater than node value
+		if(value > node->value)
+			node->right = remove(node->right, value);
+
+		//if value is less than node value
+		else if (value < node->value)
+			node->left = remove(node->left, value);
+
+		else
+		{
+			// if right is null and left is null 
+			if (nullptr == node->left && nullptr == node->right )
+			{
+				delete node;
+				return nullptr;
+			}
+
+			// if right is not null and left is null
+			if (nullptr == node->left && nullptr != node->right)
+			{
+				Node *orphan = node->right;
+				delete node;
+				return orphan;
+			}
+
+			// if right is null and left is not null
+			if (nullptr != node->left && nullptr == node->right)
+			{
+				Node *orphan = node->left;
+				delete node;
+				return orphan;
+			}
+
+			// if both right and left are not null
+
+			Node* successor = node->right;
+			while (successor->left)
+			{
+				successor = successor->left;
+			}
+			node->value = successor->value;
+			node->right = remove(node->right, successor->value);
+		}
+		return node;
+	}
+
+	// print tree pattern
+	void printDebug(Node *node)
+	{
+		static int level = 0;
+		if(node)
+		{
+			level++;
+			printDebug(node->right);
+			cout << setw(level*4) << "" <<node->value <<endl;
+			printDebug(node->left);
+			level--;
+		}
+	}
+
+	// inorder traversal
+	void Inorder(Node *p)
+	{
+		if(p)
+		{
+			Inorder(p->left);
+			cout << p->value <<endl;
+			Inorder(p->right);
+		}
+	}
+
+public:
+
+	Tree():root(nullptr)
+	{
+	}
+
+	// abstract method to add new node
+	void add(int value)
+	{
+		root = addNode(root,value);
+	}
+
+	// abstract method to remove a node
+	void remove(int value)
+	{
+		root=remove(root, value);
+	}
+
+	// abstract method for inorder
+	void printInorder()
+	{
+		Inorder(root);
+	}
+
+	// abstract method to printdebug
+	void print ()
+	{
+		printDebug(root);
+	}
+
+};
+int main()
+{
+	int num;
+	Tree t;
+	while (cout <<"Enter the values of trees (0 to exit)",
+		cin >> num,num)
+	{
+		t.add(num);
+		t.print();
+
+	}
+	cout<<"Printing in Inorder traversal"<< "\n";
+	t.printInorder();
+
+	while (cout <<"Enter the values to Remove (0 to exit)",
+		cin >> num,
+		num)
+	{
+		t.remove(num);
+		t.print();
+
+	}
+}
