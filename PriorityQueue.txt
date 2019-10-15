@@ -1,0 +1,110 @@
+#include <iostream>
+using namespace std;
+
+class Queue
+{
+	struct Node
+	{
+		int priority;
+		int value;
+		Node *next;
+
+		Node(int priority, int value): priority(priority),value(value),next(nullptr)
+		{
+		}
+	};
+
+	Node *Front;
+
+public:
+	Queue():Front(nullptr)
+	{
+	}
+
+	void EnQueue(int priority, int value)
+	{
+		Node *Back = nullptr;
+		Node *newNode = new Node(priority, value);
+		Node *current;
+
+		if (nullptr == Front)
+		{
+			Front = newNode;
+			return;
+		}
+
+
+		for(current= Front; current; current = current->next)
+		{
+			if (priority < current->priority)
+				break;
+			Back = current;
+		}
+
+		//to add node to end
+		if(nullptr == current)
+		{
+			Back->next = newNode;
+			return;
+		}
+
+		// to add node to front
+		if(nullptr == Back)
+		{
+			newNode->next = Front;
+			Front = newNode;
+			return;
+		}
+
+		//to add node in between
+		newNode->next = Back->next;
+		Back->next = newNode;
+	}
+
+	void deQueue()
+	{
+		Node *temp = Front;
+		Front = Front->next;
+		delete temp;
+
+	}
+
+	void print()
+	{
+		for(Node *current=Front; current;current=current->next)
+		{
+			cout << current->priority<<"\t" <<current->value  << "\n";
+		}
+	}
+
+
+};
+
+
+
+int main()
+{
+	int num,prio,count = 0;
+	Queue q;
+	while (cout <<"Enter the values of trees (0 to exit)",
+		cin >> prio,
+		cin >> num,
+		num)
+	{
+		q.EnQueue(prio,num);
+		q.print();
+		count ++;
+
+	}
+
+	while (count)
+	{
+		cout<<count<<"dequeue"<<endl;
+		q.deQueue();
+		q.print();
+		--count;
+	}
+	
+	
+	
+}
